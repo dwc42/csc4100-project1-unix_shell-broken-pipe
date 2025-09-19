@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "parse_command.h"
 int main(int argc, char const *argv[])
 {
 
@@ -17,7 +18,7 @@ int main(int argc, char const *argv[])
 		}
 		else
 		{
-			printf("You entered: %s", line);
+			parse_command(line);
 		}
 
 		/* code */
