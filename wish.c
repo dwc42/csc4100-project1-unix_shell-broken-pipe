@@ -2,7 +2,6 @@
 int main(int argc, char const *argv[])
 {
 
-	char buffer[255];
 	while (1)
 	{
 
@@ -18,7 +17,7 @@ int main(int argc, char const *argv[])
 		}
 		else
 		{
-			printf("You entered: %s", buffer);
+			printf("You entered: %s", line);
 		}
 
 		/* code */
