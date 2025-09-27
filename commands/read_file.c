@@ -9,5 +9,3 @@ create_read_file_data()
 	data.line = -1;
 	return data;
 }
-
-int read_file_build_command(optionKey);

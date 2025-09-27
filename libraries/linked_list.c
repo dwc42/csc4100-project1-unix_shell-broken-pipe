@@ -27,7 +27,7 @@ void printList(struct Node *head)
 	{
 		printf("%d:", i++);
 		printf("%s -> ", temp->optionName);
-		printf("%s -> ", temp->intData);
+		printf("%d -> ", temp->intData);
 		printf("%s -> ", temp->stringData);
 		temp = temp->next;
 	}

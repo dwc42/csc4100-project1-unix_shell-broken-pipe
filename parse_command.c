@@ -43,7 +43,7 @@ int parse_command(char *line)
             {
                 char *endptr;
                 int value = stringToInt(arg, endptr);
-                if (endptr == '\0')
+                if (*endptr == '\0')
                 {
                     currentNode->intData = value;
                 }
@@ -82,7 +82,7 @@ int parse_command(char *line)
     {
         char *endptr;
         int value = stringToInt(arg, endptr);
-        if (endptr == '\0')
+        if (*endptr == '\0')
         {
             currentNode->intData = value;
         }
