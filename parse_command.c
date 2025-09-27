@@ -31,6 +31,7 @@ int parse_command(char *line)
         case ' ':
         {
             char *arg = arg_parse(line, i, lastSpace);
+            printf("%s", arg);
             if (command == NULL)
             {
                 command = arg;
