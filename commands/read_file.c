@@ -9,3 +9,7 @@ create_read_file_data()
 	data.line = -1;
 	return data;
 }
+
+void test(){
+
+}
