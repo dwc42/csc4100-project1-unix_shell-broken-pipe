@@ -25,10 +25,12 @@ void printList(struct Node *head)
 	int i = 0;
 	while (temp != NULL)
 	{
-		printf("%d:", i++);
-		printf("%s -> ", temp->optionName);
-		printf("%d -> ", temp->intData);
-		printf("%s -> ", temp->stringData);
+		printf("{\n");
+		printf("  %d:\n", i++);
+		printf("  optionName: %s,\n", temp->optionName);
+		printf("  intData: %d,\n", temp->intData);
+		printf("  stringData: %s\n", temp->stringData);
+		printf("} -->\n");
 		temp = temp->next;
 	}
 	printf("NULL\n");
