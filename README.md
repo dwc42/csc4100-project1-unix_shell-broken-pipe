@@ -1,2 +1,2 @@
 to compile
-gcc $(find . -path './archive' -prune -o -name "*.c") -o out/wish
+gcc $(find . -path './archive' -prune -or -name "*.c" -print) -o out/wish
