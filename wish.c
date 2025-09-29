@@ -18,7 +18,10 @@ int main(int argc, char const *argv[])
 		}
 		else
 		{
-			parse_command(line);
+			char** output = parse_command(line);
+			for (int i =0; output[i] != NULL; i++){
+				printf("%s\n", output[i]);
+			}
 		}
 
 		/* code */
