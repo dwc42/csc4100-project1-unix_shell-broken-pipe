@@ -2,6 +2,7 @@
 #include "parse_command.h"
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 int main(int argc, char const *argv[])
 {
 
@@ -22,8 +23,8 @@ int main(int argc, char const *argv[])
 		else
 		{
 			struct Command output = parse_command(line);
-
 			printCommand(output);
+			execv(output.command, output.args);
 		}
 
 		/* code */
