@@ -3,40 +3,22 @@
 #include <stdlib.h>
 #include "libraries/string_to_int.h"
 
-//github copolit wrote this as c make no sense
 
-char **split(const char *str, const char *delim)
-{
-    char *s = strdup(str); // make a modifiable copy
-    if (!s)
-        return NULL;
-
-    char **result = NULL;
-    char *token;
-    int count =0;
-    while ((token = strsep(&s, delim)) != NULL)
-    {
-        // grow the array for each token
-        result = realloc(result, sizeof(char *) * (count + 1));
-        result[count] = strdup(token); // copy token
-        count++;
-    }
-    result[count] = NULL;
-    free(s); // strsep moves the pointer, so only the base copy would remain — no need to free
-    return result;
-}
 char *arg_parse(char *line, int i, int lastSpace)
 {
-    int len = i - (lastSpace + 1);
-    if (len > 1)
+    int start = lastSpace + 1;
+    int len = i - start;
+    if (len >= 1)
     {
-        char *command = malloc(sizeof(char) * (len + 1));
-        strncpy(command, line + (lastSpace + 1), len);
+        char *command = malloc(len + 1);
+        strncpy(command, line + start, len);
         command[len] = '\0';
         return command;
     }
+    return NULL;
 }
-enum Finding {
+enum Finding
+{
     None = 0,
     Space = 1,
     DoubleQuote = 2,
@@ -44,40 +26,62 @@ enum Finding {
     AngleBracket = 4,
 };
 
-char** parse_command(char *line)
+char **parse_command(char *line)
 {
     struct Node *currentLinkedList = NULL;
     int lastSpace = -1;
     int i = 0;
-    char *command = NULL;
+    char *argscommand = NULL;
     enum Finding findingValue = None;
     struct Node *currentNode = NULL;
-
-    for (; ; i++)
+    char **args = NULL;
+    int argCount = 0;
+    for (;; i++)
     {
         char currentChar = line[i];
         switch (currentChar)
         {
         case '"':
         {
-            if (findingValue = None) {
+            if (findingValue == None)
+            {
                 lastSpace = i;
                 findingValue = DoubleQuote;
-            } else {
-
             }
+            else
+            {
+                char *arg = arg_parse(line, i, lastSpace);
+                if (arg == NULL)
+                    continue;
+                args = realloc(args, sizeof(char *) * (argCount + 2));
+                args[argCount++] = arg; // copy token
+                args[argCount] = NULL;
+                findingValue = None;
+                lastSpace = i + 1;
+            }
+            break;
         }
         case '\n':
-        case '\0':
         case ' ':
         {
-
-            
+            if (findingValue != None && findingValue != Space)
+                continue;
+            char *arg = arg_parse(line, i, lastSpace);
+            if (arg == NULL)
+                continue;
+            args = realloc(args, sizeof(char *) * (argCount + 2));
+            args[argCount++] = arg; 
+            args[argCount] = NULL;
+            lastSpace = i;
         }
         }
-        if (currentChar == '\0') break;
+        if (currentChar == '\0')
+            break;
     }
-    printf("command: %s\n", command);
-    printf("args:\n");
-    printList(currentLinkedList);
+    if (args == NULL)
+    {
+        args = malloc(sizeof(char *));
+        argCount = 0;
+    }
+    return args;
 }

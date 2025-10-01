@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include "parse_command.h"
+#include <stdlib.h>
+#include <string.h>
 int main(int argc, char const *argv[])
 {
 
@@ -18,10 +20,13 @@ int main(int argc, char const *argv[])
 		}
 		else
 		{
-			char** output = parse_command(line);
-			for (int i =0; output[i] != NULL; i++){
-				printf("%s\n", output[i]);
+			char **output = parse_command(line);
+			for (int i = 0; output[i] != NULL; i++)
+			{
+				int len = strlen(output[i]);
+				printf("%s %d\n", output[i], len);
 			}
+			free(output);
 		}
 
 		/* code */

@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "stdio.h": "c",
-        "string_to_int.h": "c"
+        "string_to_int.h": "c",
+        "parse_command.h": "c"
     }
 }

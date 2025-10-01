@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "libraries/linked_list.h"
+#include "linked_list.h"
 #include "libraries/string_to_int.h"
 
 //github copolit wrote this as c make no sense
