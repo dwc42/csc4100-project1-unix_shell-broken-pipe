@@ -12,6 +12,7 @@ int main(int argc, char const *argv[])
 		size_t len = 0;	   // Initialize size to 0
 		long read;
 
+		printf("wish>");
 		read = getline(&line, &len, stdin);
 		// Read a line from standard input
 		if (read == -1)
@@ -21,12 +22,11 @@ int main(int argc, char const *argv[])
 		else
 		{
 			struct Command output = parse_command(line);
-			
-				printCommand(output);
+
+			printCommand(output);
 		}
 
 		/* code */
 	}
 	return 0;
 }
-
