@@ -20,16 +20,13 @@ int main(int argc, char const *argv[])
 		}
 		else
 		{
-			char **output = parse_command(line);
-			for (int i = 0; output[i] != NULL; i++)
-			{
-				int len = strlen(output[i]);
-				printf("%s %d\n", output[i], len);
-			}
-			free(output);
+			struct Command output = parse_command(line);
+			
+				printCommand(output);
 		}
 
 		/* code */
 	}
 	return 0;
 }
+

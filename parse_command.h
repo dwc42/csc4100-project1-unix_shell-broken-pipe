@@ -1,4 +1,10 @@
 #ifndef __PARSE_COMMAND_H
 #define __PARSE_COMMAND_H
-char** parse_command(char* line);
+struct Command {
+    char* command;
+    char **args;
+    char* commandArgsString;
+};
+struct Command parse_command(char* line);
+void printCommand(struct Command command);
 #endif
