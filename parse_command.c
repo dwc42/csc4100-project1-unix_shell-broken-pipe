@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "parse_command.h"
 #include "libraries/string_to_int.h"
-
 
 char *arg_parse(char *line, int i, int lastSpace)
 {
@@ -17,6 +17,7 @@ char *arg_parse(char *line, int i, int lastSpace)
     }
     return NULL;
 }
+
 enum Finding
 {
     None = 0,
@@ -28,12 +29,18 @@ enum Finding
 
 char **parse_command(char *line)
 {
-    struct Node *currentLinkedList = NULL;
     int lastSpace = -1;
+    int lastAmpersand = -1;
     int i = 0;
-    char *argscommand = NULL;
+    struct Command *totalCommands = NULL;
+    int commandsCount = 0;
     enum Finding findingValue = None;
-    struct Node *currentNode = NULL;
+    enum Finding findingSpace = None;
+    enum Finding findingAmpersand = None;
+    struct Command currentCommand;
+    currentCommand.args = NULL;
+    currentCommand.command = NULL;
+    currentCommand.commandArgsString = NULL;
     char **args = NULL;
     int argCount = 0;
     for (;; i++)
@@ -61,6 +68,13 @@ char **parse_command(char *line)
             }
             break;
         }
+        case '&':
+        {
+            totalCommands = realloc(totalCommands, sizeof(char(**)) * (commandsCount + 2));
+            totalCommands[commandsCount++] = args;
+            totalCommands[commandsCount] = NULL;
+
+        }
         case '\n':
         case ' ':
         {
@@ -70,7 +84,7 @@ char **parse_command(char *line)
             if (arg == NULL)
                 continue;
             args = realloc(args, sizeof(char *) * (argCount + 2));
-            args[argCount++] = arg; 
+            args[argCount++] = arg;
             args[argCount] = NULL;
             lastSpace = i;
         }
