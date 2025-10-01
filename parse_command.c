@@ -122,7 +122,6 @@ struct Command parse_command(char *line)
             lastSpace = i;
             if (currentChar == '\n')
             {
-                printf("8933763763");
                 goto runEnd;
             }
             break;
