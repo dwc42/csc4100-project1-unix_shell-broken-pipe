@@ -1,0 +1,3 @@
+command test & command "wddwwd dwdw"
+command2 wlwd wdkldwk 23234
+ls -dwwd wwdwdw "wddwdw wddwwd"
