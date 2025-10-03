@@ -36,12 +36,12 @@ enum Finding
     AngleBracket = 4,
 };
 
-struct Command parse_command(char *line)
+struct Command *parse_command(char *line)
 {
     int lastSpace = -1;
     int lastAmpersand = -1;
     int i = 0;
-    // struct Command *totalCommands = NULL;
+    struct Command *totalCommands = NULL;
     int commandsCount = 0;
     enum Finding findingValue = None;
     struct Command currentCommand;
@@ -50,6 +50,7 @@ struct Command parse_command(char *line)
     currentCommand.commandArgsString = NULL;
     int argCount = 0;
     char *commandArgsString = NULL;
+    int start = 1;
     for (;; i++)
     {
         char currentChar = line[i];
@@ -84,16 +85,22 @@ struct Command parse_command(char *line)
         }
         case '&':
         {
+            if (findingValue == DoubleQuote)
+                continue;
         runEnd:
             commandArgsString = arg_parse(line, i, lastAmpersand);
             currentCommand.commandArgsString = strdup(commandArgsString);
             free(commandArgsString);
-            // totalCommands = realloc(totalCommands, sizeof(struct Command) * (commandsCount + 2));
-            // totalCommands[commandsCount] = currentCommand
-            // totalCommands[++commandsCount] = getNullCommand();
-            // argCount = 0;
-            // args = malloc(sizeof(NULL));
-            // args = NULL;
+            totalCommands = realloc(totalCommands, sizeof(struct Command) * (commandsCount + 2));
+            totalCommands[commandsCount] = currentCommand;
+            totalCommands[++commandsCount] = getNullCommand();
+            currentCommand.args = NULL;
+            currentCommand.command = NULL;
+            currentCommand.commandArgsString = NULL;
+            argCount = 0;
+            lastAmpersand = i;
+            lastSpace = i;
+            start =0;
             break;
         }
         case '\0':
@@ -106,6 +113,12 @@ struct Command parse_command(char *line)
         {
             if (findingValue != None && findingValue != Space)
                 continue;
+            if (start) continue;
+            if (findingValue == Space) {
+                lastSpace = i;
+                continue;
+            }
+            findingValue = Space;
             char *arg = arg_parse(line, i, lastSpace);
             if (arg == NULL)
                 continue;
@@ -126,16 +139,21 @@ struct Command parse_command(char *line)
             }
             break;
         }
+        default: {
+            start =0;
+            if (findingValue == Space) findingValue = None;
+        }
         }
         if (currentChar == '\n' || currentChar == '\0')
             break;
+        
     }
-    return currentCommand;
+    return totalCommands;
 }
 void printCommand(struct Command command)
 {
     printf("{\n");
-    printf("  Command: %s,\n", command.command);
+    printf("  Command: %s\n", command.command);
     printf("  Args: [");
     if (command.args != NULL)
         for (int i = 0; command.args[i] != NULL;)
@@ -151,6 +169,6 @@ void printCommand(struct Command command)
             }
         }
     printf("]\n");
-    printf("  CommandArgsString: %s,\n", command.commandArgsString);
+    printf("  CommandArgsString: %s\n", command.commandArgsString);
     printf("}\n");
 }
