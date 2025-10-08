@@ -7,6 +7,10 @@ char *getErrorMessage(enum Errors errorId)
 {
     switch (errorId)
     {
+    case CommandParseFailure:
+    {
+        return "Command Parse Failure Error has occured";
+    }
     case EXEVPFailure:
     {
         return "Execuable Run Failure Error has occured";

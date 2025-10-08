@@ -10,6 +10,7 @@ enum Errors {
     ForkFailure = 5,
     FileOpenFailure = 6,
     EXEVPFailure = 7,
+    CommandParseFailure = 8
 };
 char *getErrorMessage(enum Errors errorId);
 void print_error(enum Errors errorId, int fileLine);

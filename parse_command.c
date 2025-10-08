@@ -56,10 +56,11 @@ struct Command *parse_command(char *line)
     int redirectFound = 0;
     int afterRedirect = 0;
     char currentChar = '\0';
-    do {
+    do
+    {
         int j = i++;
         currentChar = line[j];
-        printf("char: %d, %c - %d - %d - f:%d\n", currentChar,currentChar, j, lastSpace, findingValue);
+        printf("char: %d, %c - %d - %d - f:%d\n", currentChar, currentChar, j, lastSpace, findingValue);
         switch (currentChar)
         {
         case ' ':
@@ -72,7 +73,7 @@ struct Command *parse_command(char *line)
             break;
         }
         }
-        
+
         switch (currentChar)
         {
         case '"':
@@ -98,7 +99,7 @@ struct Command *parse_command(char *line)
                     currentCommand.args[argCount] = NULL;
                 }
                 findingValue = Space;
-                lastSpace = j + 1;
+                lastSpace = j;
             }
             break;
         }
@@ -170,7 +171,7 @@ struct Command *parse_command(char *line)
                 continue;
             if (start)
                 continue;
-            if (findingValue == Space)
+            if (currentChar == ' ' && findingValue == Space)
             {
                 lastSpace = j;
                 continue;
@@ -179,8 +180,9 @@ struct Command *parse_command(char *line)
             findingValue = Space;
             char *arg = arg_parse(line, j, lastSpace);
             printf("arg parsed\n");
-            
-            if (arg == NULL) {
+
+            if (arg == NULL)
+            {
                 printf("null\n");
                 lastSpace = j;
                 continue;

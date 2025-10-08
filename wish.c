@@ -112,7 +112,11 @@ int handle_builtin(char *command, char **args, int fileLine)
 int handle_command(char *line, int fileLine)
 {
 	struct Command *output = parse_command(line);
-
+	if (output == NULL)
+    {
+		print_error(CommandParseFailure, fileLine);
+        return 0;
+    }
 	int cmd_count = 0;
 	while (output[cmd_count].command != NULL)
 	{
