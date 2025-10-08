@@ -5,19 +5,22 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include "wish_exec.h"
-
+#include "error_table.h"
 // This function is called from within a child process (no fork needed)
-void execute_command_child(char *command, char **args, char **paths, char *output_file) {
-    if (command == NULL) {
+void execute_command_child(char *command, char **args, char **paths, char *output_file, int fileLine)
+{
+    if (command == NULL)
+    {
         exit(1);
     }
 
     // Handle redirection
-    if (output_file != NULL) {
+    if (output_file != NULL)
+    {
         int fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (fd < 0) {
-            char error_message[30] = "An error has occurred\n";
-            write(STDERR_FILENO, error_message, strlen(error_message));
+        if (fd < 0)
+        {
+            print_error(FileOpenFailure, fileLine);
             exit(1);
         }
         dup2(fd, STDOUT_FILENO);
@@ -28,17 +31,21 @@ void execute_command_child(char *command, char **args, char **paths, char *outpu
     char exec_path[256];
     int found = 0;
 
-    for (int i = 0; paths != NULL && paths[i] != NULL; i++) {
+    for (int i = 0; paths != NULL && paths[i] != NULL; i++)
+    {
         snprintf(exec_path, sizeof(exec_path), "%s/%s", paths[i], command);
-        if (access(exec_path, X_OK) == 0) {
+        if (access(exec_path, X_OK) == 0)
+        {
             found = 1;
 
             // Build argv for execv()
             char *exec_args[50];
             int j = 0;
             exec_args[j++] = command;
-            if (args != NULL) {
-                for (int k = 0; args[k] != NULL && j < 49; k++) {
+            if (args != NULL)
+            {
+                for (int k = 0; args[k] != NULL && j < 49; k++)
+                {
                     exec_args[j++] = args[k];
                 }
             }
@@ -47,37 +54,39 @@ void execute_command_child(char *command, char **args, char **paths, char *outpu
             execv(exec_path, exec_args);
 
             // If execv returns, it failed
-            char error_message[30] = "An error has occurred\n";
-            write(STDERR_FILENO, error_message, strlen(error_message));
+            print_error(EXEVPFailure, fileLine);
             exit(1);
         }
     }
 
-    if (!found) {
-        char error_message[30] = "An error has occurred\n";
-        write(STDERR_FILENO, error_message, strlen(error_message));
+    if (!found)
+    {
+        print_error(PathInvalid, fileLine);
         exit(1);
     }
 }
 
-void execute_command(char *command, char **args, char **paths, char *output_file) {
+void execute_command(char *command, char **args, char **paths, char *output_file, int fileLine)
+{
     if (command == NULL)
         return;
 
     pid_t pid = fork();
-    if (pid < 0) {
-        char error_message[30] = "An error has occurred\n";
-        write(STDERR_FILENO, error_message, strlen(error_message));
+    if (pid < 0)
+    {
+        print_error(ForkFailure, fileLine);
         return;
     }
 
-    if (pid == 0) {
+    if (pid == 0)
+    {
 
-        if (output_file != NULL) {
+        if (output_file != NULL)
+        {
             int fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-            if (fd < 0){
-                char error_message[30] = "An error has occurred\n";
-                write(STDERR_FILENO, error_message, strlen(error_message));
+            if (fd < 0)
+            {
+                print_error(FileOpenFailure, fileLine);
                 exit(1);
             }
 
@@ -91,17 +100,21 @@ void execute_command(char *command, char **args, char **paths, char *output_file
         char exec_path[256];
         int found = 0;
 
-        for (int i = 0; paths[i] != NULL; i++) {
+        for (int i = 0; paths[i] != NULL; i++)
+        {
             snprintf(exec_path, sizeof(exec_path), "%s/%s", paths[i], command);
-            if (access(exec_path, X_OK) == 0) {
+            if (access(exec_path, X_OK) == 0)
+            {
                 found = 1;
 
                 // Build argv for execv()
                 char *exec_args[50];
                 int j = 0;
                 exec_args[j++] = command;
-                if (args != NULL) {
-                    for (int k = 0; args[k] != NULL && j < 49; k++) {
+                if (args != NULL)
+                {
+                    for (int k = 0; args[k] != NULL && j < 49; k++)
+                    {
                         exec_args[j++] = args[k];
                     }
                 }
@@ -109,18 +122,19 @@ void execute_command(char *command, char **args, char **paths, char *output_file
 
                 execv(exec_path, exec_args);
 
-                char error_message[30] = "An error has occurred\n";
-                write(STDERR_FILENO, error_message, strlen(error_message));
+                print_error(EXEVPFailure, fileLine);
                 exit(1);
             }
         }
 
-        if (!found) {
-            char error_message[30] = "An error has occurred\n";
-            write(STDERR_FILENO, error_message, strlen(error_message));
+        if (!found)
+        {
+            print_error(PathInvalid, fileLine);
             exit(1);
         }
-    } else {
+    }
+    else
+    {
         // --- Parent process waits for child ---
         int status;
         waitpid(pid, &status, 0);

@@ -2,6 +2,11 @@
     "files.associations": {
         "stdio.h": "c",
         "string_to_int.h": "c",
-        "parse_command.h": "c"
+        "parse_command.h": "c",
+        "string_int.h": "c",
+        "errno.h": "c",
+        "unistd.h": "c",
+        "string.h": "c",
+        "fcntl.h": "c"
     }
 }
