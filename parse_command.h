@@ -9,4 +9,5 @@ struct Command
 };
 struct Command *parse_command(char *line);
 void printCommand(struct Command command);
+void freeCommands(struct Command* commands);
 #endif

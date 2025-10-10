@@ -113,10 +113,10 @@ int handle_command(char *line, int fileLine)
 {
 	struct Command *output = parse_command(line);
 	if (output == NULL)
-    {
+	{
 		print_error(CommandParseFailure, fileLine);
-        return 0;
-    }
+		goto returnLabel;
+	}
 	int cmd_count = 0;
 	while (output[cmd_count].command != NULL)
 	{
@@ -156,7 +156,7 @@ int handle_command(char *line, int fileLine)
 			{
 
 				execute_command_child(output[i].command, output[i].args, search_paths, output[i].output_file, fileLine);
-
+				freeCommands(output);
 				exit(1);
 			}
 			else
@@ -169,6 +169,9 @@ int handle_command(char *line, int fileLine)
 			waitpid(pids[i], NULL, 0);
 		}
 	}
+returnLabel:
+	freeCommands(output);
+	return 0;
 }
 int main(int argc, char const *argv[])
 {

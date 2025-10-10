@@ -60,7 +60,8 @@ struct Command *parse_command(char *line)
     {
         int j = i++;
         currentChar = line[j];
-        printf("char: %d, %c - %d - %d - f:%d\n", currentChar, currentChar, j, lastSpace, findingValue);
+        // printf("char: %d, %c - %d - %d - f:%d\n", currentChar, currentChar, j, lastSpace, findingValue);
+        // printCommand(currentCommand);
         switch (currentChar)
         {
         case ' ':
@@ -145,6 +146,7 @@ struct Command *parse_command(char *line)
             if (findingValue == DoubleQuote)
                 continue;
         runEnd:
+            // printf("wdkjjkwdkjdw");
             commandArgsString = arg_parse(line, j, lastAmpersand);
             currentCommand.commandArgsString = strdup(commandArgsString);
             free(commandArgsString);
@@ -179,15 +181,19 @@ struct Command *parse_command(char *line)
 
             findingValue = Space;
             char *arg = arg_parse(line, j, lastSpace);
-            printf("arg parsed\n");
+            // printf("arg parsed\n");
 
             if (arg == NULL)
             {
-                printf("null\n");
+                if (currentChar == '\n' || currentChar == '\0')
+                {
+                    goto runEnd;
+                }
+                // printf("null\n");
                 lastSpace = j;
                 continue;
             }
-            printf("%s\n", arg);
+            // printf("%s\n", arg);
             if (afterRedirect)
             {
                 if (currentCommand.output_file != NULL)
@@ -250,4 +256,25 @@ void printCommand(struct Command command)
     printf("]\n");
     printf("  CommandArgsString: %s\n", command.commandArgsString);
     printf("}\n");
+}
+
+void freeCommands(struct Command *commands)
+{
+    if (commands == NULL)
+        return;
+    for (int i = 0; commands[i].command != NULL; i++)
+    {
+        if (commands[i].args != NULL)
+        {
+            for (int j = 0; commands[i].args[j] != NULL; j++)
+            {
+                free(commands[i].args[j]);
+            }
+            free(commands[i].args);
+        }
+        free(commands[i].command);
+        free(commands[i].commandArgsString);
+        free(commands[i].output_file);
+    }
+    free(commands);
 }
