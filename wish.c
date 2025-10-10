@@ -111,6 +111,26 @@ int handle_builtin(char *command, char **args, int fileLine)
 }
 int handle_command(char *line, int fileLine)
 {
+	if (line == NULL) return -1;
+	if (line[0] == '\0') return -1;
+	if (line[0] == '\n') return -1;
+	int onlySpace =1;
+	int commentDetected = 0;
+	for (int i =0; line[i] != '\0' && line[i] != '\n' && line[i] != '\r'; i++) {
+		
+		if (line[i] == '#') {
+			commentDetected = i;
+			onlySpace =0;
+			break;
+		}
+		if (line[i] > ' ') {
+			onlySpace =0;
+			break;
+		}
+		
+	}
+	if (onlySpace) return 0;
+	if (line[commentDetected] == '#') return 0;
 	struct Command *output = parse_command(line);
 	if (output == NULL)
 	{
@@ -221,7 +241,7 @@ int main(int argc, char const *argv[])
 	char *line = NULL; // Pointer to the buffer that will hold the line
 	size_t len = 0;	   // Size of the buffer
 	size_t read;
-	int i = 0;
+	int i = 1;
 	while ((read = getline(&line, &len, fptr)) != -1)
 	{
 

@@ -129,6 +129,7 @@ void execute_command(char *command, char **args, char **paths, char *output_file
 
         if (!found)
         {
+            printf("PathInvalid threw 132");
             print_error(PathInvalid, fileLine);
             exit(1);
         }

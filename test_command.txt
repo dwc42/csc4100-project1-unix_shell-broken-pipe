@@ -1,2 +1,9 @@
-cd "test files"
-ls > test.output.txt
+# cd "test files"
+    # ls > test.output.txt
+
+# this should be working but it is not
+./test_while_1 
+
+# this should be working but it is not
+# parrle parseing is broke so give that second.
+# ./test_while_1 && ./test_while_2
