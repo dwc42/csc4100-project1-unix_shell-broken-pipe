@@ -6,4 +6,4 @@
 
 # this should be working but it is not
 # parrle parseing is broke so give that second.
-# ./test_while_1 && ./test_while_2
+./test_while_1 && ./test_while_2

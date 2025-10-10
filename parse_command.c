@@ -56,10 +56,13 @@ struct Command *parse_command(char *line)
     int redirectFound = 0;
     int afterRedirect = 0;
     char currentChar = '\0';
+    char lastChar = currentChar;
     do
     {
         int j = i++;
+        lastChar = currentChar;
         currentChar = line[j];
+        
         // printf("char: %d, %c - %d - %d - f:%d\n", currentChar, currentChar, j, lastSpace, findingValue);
         // printCommand(currentCommand);
         switch (currentChar)
@@ -143,16 +146,41 @@ struct Command *parse_command(char *line)
         }
         case '&':
         {
+            if (lastChar == '&') continue;
             if (findingValue == DoubleQuote)
                 continue;
         runEnd:
-            // printf("wdkjjkwdkjdw");
+            // Safely build commandArgsString
             commandArgsString = arg_parse(line, j, lastAmpersand);
-            currentCommand.commandArgsString = strdup(commandArgsString);
-            free(commandArgsString);
-            totalCommands = realloc(totalCommands, sizeof(struct Command) * (commandsCount + 2));
-            totalCommands[commandsCount] = currentCommand;
-            totalCommands[++commandsCount] = getNullCommand();
+            if (commandArgsString != NULL) {
+                currentCommand.commandArgsString = strdup(commandArgsString);
+                free(commandArgsString);
+            } else {
+                currentCommand.commandArgsString = NULL;
+            }
+
+            // Only append if this command has something (command/args/redirection)
+            int has_anything = (currentCommand.command != NULL) ||
+                               (currentCommand.args != NULL) ||
+                               (currentCommand.output_file != NULL);
+
+            if (has_anything) {
+                totalCommands = realloc(totalCommands, sizeof(struct Command) * (commandsCount + 2));
+                totalCommands[commandsCount] = currentCommand;
+                commandsCount++;
+                totalCommands[commandsCount] = getNullCommand(); // maintain sentinel
+            } else {
+                // Nothing to add; free any partial allocations just in case
+                if (currentCommand.args) {
+                    for (int k = 0; currentCommand.args[k] != NULL; k++) free(currentCommand.args[k]);
+                    free(currentCommand.args);
+                }
+                free(currentCommand.command);
+                free(currentCommand.commandArgsString);
+                free(currentCommand.output_file);
+            }
+
+            // Reset for next command
             currentCommand.args = NULL;
             currentCommand.command = NULL;
             currentCommand.commandArgsString = NULL;
@@ -233,6 +261,7 @@ struct Command *parse_command(char *line)
         }
         }
     } while (currentChar != '\n' && currentChar != '\0');
+    if (totalCommands == NULL) return NULL;
     return totalCommands;
 }
 void printCommand(struct Command command)
