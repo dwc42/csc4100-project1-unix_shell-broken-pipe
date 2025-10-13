@@ -5,6 +5,7 @@ struct Command
     char *command;
     char **args;
     char *commandArgsString;
+    char *output_file;
 };
 struct Command *parse_command(char *line);
 void printCommand(struct Command command);

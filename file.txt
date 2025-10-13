@@ -1,0 +1,17 @@
+archive
+commands
+file.txt
+libraries
+out
+parse_command.c
+parse_command.h
+README.md
+string.c
+test_command.txt
+wish.c
+wish_cmds.c
+wish_cmds.h
+wish_exec.c
+wish_exec.h
+wish_path.c
+wish_path.h

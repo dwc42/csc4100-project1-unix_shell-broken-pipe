@@ -2,6 +2,9 @@
     "files.associations": {
         "stdio.h": "c",
         "string_to_int.h": "c",
-        "parse_command.h": "c"
+        "parse_command.h": "c",
+        "stdlib.h": "c",
+        "wish_cd.h": "c",
+        "wish_path.h": "c"
     }
 }

@@ -24,6 +24,7 @@ struct Command getNullCommand()
     NullCommand.args = NULL;
     NullCommand.command = NULL;
     NullCommand.commandArgsString = NULL;
+    NullCommand.output_file =NULL;
     return NullCommand;
 }
 
@@ -48,9 +49,12 @@ struct Command *parse_command(char *line)
     currentCommand.args = NULL;
     currentCommand.command = NULL;
     currentCommand.commandArgsString = NULL;
+    currentCommand.output_file = NULL;
     int argCount = 0;
     char *commandArgsString = NULL;
     int start = 1;
+    int redirectFound = 0;
+    int afterRedirect = 0;
     for (;; i++)
     {
         char currentChar = line[i];
@@ -83,6 +87,37 @@ struct Command *parse_command(char *line)
             }
             break;
         }
+        case '>':
+        {
+            if (findingValue == DoubleQuote)
+                continue;
+    
+            // Check for multiple redirects (error case)
+            if (redirectFound) {
+                // Multiple > symbols - we'll just use the last one for now
+                // (The error will be caught when we see multiple filenames)
+            }
+            redirectFound = 1;
+            afterRedirect = 1;
+    
+            // Parse any remaining argument before the >
+            if (findingValue != Space && findingValue != None) {
+                char *arg = arg_parse(line, i, lastSpace);
+                if (arg != NULL) {
+                    if (currentCommand.command == NULL) {
+                        currentCommand.command = arg;
+                    } else {
+                        currentCommand.args = realloc(currentCommand.args, sizeof(char *) * (argCount + 2));
+                        currentCommand.args[argCount++] = arg;
+                        currentCommand.args[argCount] = NULL;
+                    }
+                }
+            }
+    
+            lastSpace = i;
+            findingValue = Space;
+            break;
+        }
         case '&':
         {
             if (findingValue == DoubleQuote)
@@ -97,6 +132,9 @@ struct Command *parse_command(char *line)
             currentCommand.args = NULL;
             currentCommand.command = NULL;
             currentCommand.commandArgsString = NULL;
+            currentCommand.output_file = NULL;
+            redirectFound = 0;
+            afterRedirect = 0;
             argCount = 0;
             lastAmpersand = i;
             lastSpace = i;
@@ -122,14 +160,20 @@ struct Command *parse_command(char *line)
             char *arg = arg_parse(line, i, lastSpace);
             if (arg == NULL)
                 continue;
-            if (currentCommand.command == NULL)
-            {
+            
+            if (afterRedirect){
+                if(currentCommand.output_file != NULL){
+
+                    free(arg);
+                }else{
+                    currentCommand.output_file = arg;
+                }
+                afterRedirect = 0;
+            }else if(currentCommand.command == NULL){
                 currentCommand.command = arg;
-            }
-            else
-            {
+            }else{
                 currentCommand.args = realloc(currentCommand.args, sizeof(char *) * (argCount + 2));
-                currentCommand.args[argCount++] = arg; // copy token
+                currentCommand.args[argCount++] = arg;
                 currentCommand.args[argCount] = NULL;
             }
             lastSpace = i;
