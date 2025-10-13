@@ -5,6 +5,7 @@
         "parse_command.h": "c",
         "stdlib.h": "c",
         "wish_cd.h": "c",
-        "wish_path.h": "c"
+        "wish_path.h": "c",
+        "wish_cmds.h": "c"
     }
 }

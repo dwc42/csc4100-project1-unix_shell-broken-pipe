@@ -80,8 +80,8 @@ int main(int argc, char const *argv[])
 						}
 
 					}
-					for (int i = 0; pid_count; i++){
-						waitpid(pids[i], NULL, 0);
+					for (int i = 0; i < pid_count; i++) {
+    					waitpid(pids[i], NULL, 0);
 					}
 
 				}
@@ -103,7 +103,7 @@ int main(int argc, char const *argv[])
 	}
 	char *line = NULL; // Pointer to the buffer that will hold the line
 	size_t len = 0;	   // Size of the buffer
-	size_t read;
+	ssize_t read;
 	while ((read = getline(&line, &len, fptr)) != -1)
 	{
 		// 'line' now contains the current line, including the newline character if present

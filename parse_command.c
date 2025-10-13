@@ -124,9 +124,20 @@ struct Command *parse_command(char *line)
                 continue;
         runEnd:
             commandArgsString = arg_parse(line, i, lastAmpersand);
-            currentCommand.commandArgsString = strdup(commandArgsString);
-            free(commandArgsString);
+            if (commandArgsString != NULL) {
+                currentCommand.commandArgsString = strdup(commandArgsString);
+                free(commandArgsString);
+            } else {
+                currentCommand.commandArgsString = NULL;
+            }
+
             totalCommands = realloc(totalCommands, sizeof(struct Command) * (commandsCount + 2));
+            if (totalCommands == NULL) {
+                struct Command *tmp = malloc(sizeof(struct Command) * 1);
+                tmp[0] = getNullCommand();
+                return tmp;
+            }
+
             totalCommands[commandsCount] = currentCommand;
             totalCommands[++commandsCount] = getNullCommand();
             currentCommand.args = NULL;
@@ -192,6 +203,11 @@ struct Command *parse_command(char *line)
             break;
         
     }
+    if (totalCommands == NULL) {
+        totalCommands = malloc(sizeof(struct Command) * 1);
+        totalCommands[0] = getNullCommand();
+    }
+return totalCommands;
     return totalCommands;
 }
 void printCommand(struct Command command)
