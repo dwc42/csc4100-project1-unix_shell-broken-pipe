@@ -6,7 +6,7 @@
 
 runs exes/commands as well.  
 & for runing commands parallel
-> to store the output in a file ie redirection.
+\> to store the output in a file ie redirection.
 ## Running the Project
 to run  
 ```bash
