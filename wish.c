@@ -135,7 +135,8 @@ int handle_command(char *line, int fileLine)
 	if (output == NULL)
 	{
 		print_error(CommandParseFailure, fileLine);
-		goto returnLabel;
+		freeCommands(output);
+		return 0;
 	}
 	int cmd_count = 0;
 	while (output[cmd_count].command != NULL)
@@ -145,11 +146,13 @@ int handle_command(char *line, int fileLine)
 
 	if (cmd_count == 1)
 	{
-		// printCommand(output[0]);
+		printCommand(output[0]);
 		if (!handle_builtin(output[0].command, output[0].args, fileLine))
 		{
 			execute_command(output[0].command, output[0].args, search_paths, output[0].output_file, fileLine);
 		}
+		freeCommands(output);
+		return 0;
 	}
 
 	else if (cmd_count > 1)
@@ -159,7 +162,7 @@ int handle_command(char *line, int fileLine)
 
 		for (int i = 0; i < cmd_count; i++)
 		{
-			// printCommand(output[i]);
+			printCommand(output[i]);
 			if (handle_builtin(output[i].command, output[i].args, fileLine))
 			{
 				continue;
@@ -189,7 +192,6 @@ int handle_command(char *line, int fileLine)
 			waitpid(pids[i], NULL, 0);
 		}
 	}
-returnLabel:
 	freeCommands(output);
 	return 0;
 }

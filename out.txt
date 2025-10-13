@@ -1,0 +1,18 @@
+archive
+error_table.c
+error_table.h
+libraries
+out
+out.txt
+parse_command.c
+parse_command.h
+parsing_test.txt
+README.md
+string.c
+test_command.txt
+test files
+test_while_1
+test_while_2
+wish.c
+wish_exec.c
+wish_exec.h

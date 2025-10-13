@@ -1,0 +1,3 @@
+command.js
+test tst.txt
+test.txt

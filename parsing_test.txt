@@ -1,0 +1,12 @@
+   #
+ 	   ls  	   	  &       	ls
+ls & ls
+ls -ra
+ls > out.txt
+"ls"
+cd "test files"
+ls "ls is working.txt"
+pwd > "pwd is working.txt"
+cd ..
+# wkjdwkj lsjuwkj
+ls > "ls is working.txt1" & ls > "ls is working2.txt" & ls > "ls is working3.txt"

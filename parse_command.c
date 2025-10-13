@@ -42,32 +42,40 @@ struct Command *parse_command(char *line)
     int lastSpace = -1;
     int lastAmpersand = -1;
     int i = 0;
+    // outpout stuct array of all the commands between the ampersands which will run in parrel
     struct Command *totalCommands = NULL;
     int commandsCount = 0;
     enum Finding findingValue = None;
+    // current command the system is building
     struct Command currentCommand;
+    // command intailsation
     currentCommand.args = NULL;
     currentCommand.command = NULL;
     currentCommand.commandArgsString = NULL;
     currentCommand.output_file = NULL;
     int argCount = 0;
     char *commandArgsString = NULL;
+    // removes beginning spaces
     int start = 1;
+    // control for when > was found for redirection
     int redirectFound = 0;
     int afterRedirect = 0;
+
     char currentChar = '\0';
+    // for ingoring muliple &
     char lastChar = currentChar;
     do
     {
         int j = i++;
         lastChar = currentChar;
         currentChar = line[j];
-        
+
         // printf("char: %d, %c - %d - %d - f:%d\n", currentChar, currentChar, j, lastSpace, findingValue);
         // printCommand(currentCommand);
         switch (currentChar)
         {
         case ' ':
+        case '\t':
 
             break;
         default:
@@ -82,6 +90,7 @@ struct Command *parse_command(char *line)
         {
         case '"':
         {
+
             if (findingValue != DoubleQuote)
             {
                 lastSpace = j;
@@ -91,16 +100,35 @@ struct Command *parse_command(char *line)
             {
                 char *arg = arg_parse(line, j, lastSpace);
                 if (arg == NULL)
-                    continue;
-                if (currentCommand.command == NULL)
                 {
-                    currentCommand.command = arg;
+                    findingValue = Space;
+                    lastSpace = j;
+                }
+                if (afterRedirect)
+                {
+                    if (currentCommand.output_file != NULL)
+                    {
+
+                        free(arg);
+                    }
+                    else
+                    {
+                        currentCommand.output_file = arg;
+                    }
+                    afterRedirect = 0;
                 }
                 else
                 {
-                    currentCommand.args = realloc(currentCommand.args, sizeof(char *) * (argCount + 2));
-                    currentCommand.args[argCount++] = arg; // copy token
-                    currentCommand.args[argCount] = NULL;
+                    if (currentCommand.command == NULL)
+                    {
+                        currentCommand.command = arg;
+                    }
+                    else
+                    {
+                        currentCommand.args = realloc(currentCommand.args, sizeof(char *) * (argCount + 2));
+                        currentCommand.args[argCount++] = arg; // copy token
+                        currentCommand.args[argCount] = NULL;
+                    }
                 }
                 findingValue = Space;
                 lastSpace = j;
@@ -117,6 +145,7 @@ struct Command *parse_command(char *line)
             {
                 // Multiple > symbols - we'll just use the last one for now
                 // (The error will be caught when we see multiple filenames)
+                continue;
             }
             redirectFound = 1;
             afterRedirect = 1;
@@ -146,33 +175,42 @@ struct Command *parse_command(char *line)
         }
         case '&':
         {
-            if (lastChar == '&') continue;
+            if (lastChar == '&')
+            {
+                lastAmpersand = j; // keep separator window at the latest &
+                lastSpace = j;     // prevent building a token like "&&&"
+                continue;
+            }
             if (findingValue == DoubleQuote)
                 continue;
         runEnd:
-            // Safely build commandArgsString
-            commandArgsString = arg_parse(line, j, lastAmpersand);
-            if (commandArgsString != NULL) {
-                currentCommand.commandArgsString = strdup(commandArgsString);
-                free(commandArgsString);
-            } else {
-                currentCommand.commandArgsString = NULL;
-            }
+            // Only append if there is a real command
+            if (currentCommand.command != NULL)
+            {
+                // Build commandArgsString now (only when appending)
+                commandArgsString = arg_parse(line, j, lastAmpersand);
+                if (commandArgsString != NULL)
+                {
+                    currentCommand.commandArgsString = strdup(commandArgsString);
+                    free(commandArgsString);
+                }
+                else
+                {
+                    currentCommand.commandArgsString = NULL;
+                }
 
-            // Only append if this command has something (command/args/redirection)
-            int has_anything = (currentCommand.command != NULL) ||
-                               (currentCommand.args != NULL) ||
-                               (currentCommand.output_file != NULL);
-
-            if (has_anything) {
                 totalCommands = realloc(totalCommands, sizeof(struct Command) * (commandsCount + 2));
                 totalCommands[commandsCount] = currentCommand;
                 commandsCount++;
-                totalCommands[commandsCount] = getNullCommand(); // maintain sentinel
-            } else {
-                // Nothing to add; free any partial allocations just in case
-                if (currentCommand.args) {
-                    for (int k = 0; currentCommand.args[k] != NULL; k++) free(currentCommand.args[k]);
+                totalCommands[commandsCount] = getNullCommand(); // sentinel
+            }
+            else
+            {
+                // Drop empty/invalid command: free partial allocations
+                if (currentCommand.args)
+                {
+                    for (int k = 0; currentCommand.args[k] != NULL; k++)
+                        free(currentCommand.args[k]);
                     free(currentCommand.args);
                 }
                 free(currentCommand.command);
@@ -195,19 +233,21 @@ struct Command *parse_command(char *line)
         }
         case '\0':
         case '\n':
+        case '\t':
         case ' ':
         {
-            if (findingValue != None && findingValue != Space)
-                continue;
-            if (start)
-                continue;
-            if (currentChar == ' ' && findingValue == Space)
+            // so other findings ingore spaces
+            if (findingValue == DoubleQuote) break;
+
+            // Leading whitespace
+            if (start) { lastSpace = j; break; }
+            // ingores multiple spaces
+            if ((currentChar == ' ' || currentChar == '\t') && findingValue == Space)
             {
                 lastSpace = j;
                 continue;
             }
-
-            findingValue = Space;
+            // gets the last string to add to arg or set command
             char *arg = arg_parse(line, j, lastSpace);
             // printf("arg parsed\n");
 
@@ -222,6 +262,7 @@ struct Command *parse_command(char *line)
                 continue;
             }
             // printf("%s\n", arg);
+            // handles text after > for redirection
             if (afterRedirect)
             {
                 if (currentCommand.output_file != NULL)
@@ -235,17 +276,22 @@ struct Command *parse_command(char *line)
                 }
                 afterRedirect = 0;
             }
+            // sets command
             else if (currentCommand.command == NULL)
             {
                 currentCommand.command = arg;
             }
+            // pushs a arg
             else
             {
                 currentCommand.args = realloc(currentCommand.args, sizeof(char *) * (argCount + 2));
                 currentCommand.args[argCount++] = arg;
                 currentCommand.args[argCount] = NULL;
             }
+            // sets the last space for arg handling
             lastSpace = j;
+            findingValue = Space;
+            // runs end
             if (currentChar == '\n' || currentChar == '\0')
             {
                 goto runEnd;
@@ -254,22 +300,26 @@ struct Command *parse_command(char *line)
         }
         default:
         {
+            // if not space reset start
             start = 0;
+            // if also not space reset space skiping
             if (findingValue == Space)
                 findingValue = None;
             break;
         }
         }
     } while (currentChar != '\n' && currentChar != '\0');
-    if (totalCommands == NULL) return NULL;
+    // return null pointer if null.
+    if (totalCommands == NULL)
+        return NULL;
     return totalCommands;
 }
 void printCommand(struct Command command)
 {
     printf("{\n");
-    printf("  Command: %s\n", command.command);
+    printf("  Command: %s\n", command.command ? command.command : "NULL");
     printf("  Args: [");
-    if (command.args != NULL)
+    if (command.args)
         for (int i = 0; command.args[i] != NULL;)
         {
             printf("\"%s\"", command.args[i]);
@@ -283,7 +333,7 @@ void printCommand(struct Command command)
             }
         }
     printf("]\n");
-    printf("  CommandArgsString: %s\n", command.commandArgsString);
+    printf("  CommandArgsString: %s\n", command.commandArgsString ? command.commandArgsString : "NULL");
     printf("}\n");
 }
 
