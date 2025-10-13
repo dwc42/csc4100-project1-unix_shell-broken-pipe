@@ -2,7 +2,7 @@
     # ls > test.output.txt
 
 # this should be working but it is not
-./test_while_1 
+#./test_while_1 
 
 # this should be working but it is not
-# ./test_while_1 && ./test_while_2
+./test_while_1 && ./test_while_2

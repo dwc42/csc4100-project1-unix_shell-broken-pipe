@@ -9,40 +9,40 @@ char *getErrorMessage(enum Errors errorId)
     {
     case CommandParseFailure:
     {
-        return "Command Parse Failure Error has occured";
+        return "An error has occurred"; // "Command Parse Failure Error has occured";
     }
     case EXEVPFailure:
     {
-        return "Execuable Run Failure Error has occured";
+        return "An error has occurred"; // "Execuable Run Failure Error has occured";
     }
     case FileOpenFailure:
     {
-        return "File Open Failure Error has occured";
+        return "An error has occurred"; // "File Open Failure Error has occured";
     }
     case ForkFailure:
     {
-        return "Fork Failure Error has occured";
+        return "An error has occurred"; // "Fork Failure Error has occured";
     }
     case PathInvalid:
     {
-        return "Path Invaild Error has occured";
+        return "An error has occurred"; // "Path Invaild Error has occured";
     }
     case TooManyArgs:
     {
-        return "Too Many Arguments Error has occured";
+        return "An error has occurred"; // "Too Many Arguments Error has occured";
     }
     case TooFewArgs:
     {
-        return "Too Few Arguments Error has occured";
+        return "An error has occurred"; // "Too Few Arguments Error has occured";
     }
     case ValueIsNull:
     {
-        return "Value is Null Error has occured";
+        return "An error has occurred"; // "Value is Null Error has occured";
     }
     case Unknown:
     default:
     {
-        return "Unknown Error has occured";
+        return "An error has occurred"; // "Unknown Error has occured";
     }
     }
 };

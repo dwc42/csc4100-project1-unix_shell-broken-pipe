@@ -146,7 +146,7 @@ int handle_command(char *line, int fileLine)
 
 	if (cmd_count == 1)
 	{
-		printCommand(output[0]);
+		//printCommand(output[0]);
 		if (!handle_builtin(output[0].command, output[0].args, fileLine))
 		{
 			execute_command(output[0].command, output[0].args, search_paths, output[0].output_file, fileLine);
@@ -162,7 +162,7 @@ int handle_command(char *line, int fileLine)
 
 		for (int i = 0; i < cmd_count; i++)
 		{
-			printCommand(output[i]);
+			//printCommand(output[i]);
 			if (handle_builtin(output[i].command, output[i].args, fileLine))
 			{
 				continue;
