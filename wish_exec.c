@@ -31,6 +31,28 @@ void execute_command_child(char *command, char **args, char **paths, char *outpu
     char exec_path[256];
     int found = 0;
 
+    
+    if (strchr(command, '/')) {
+        if (access(command, X_OK) == 0) {
+            
+            char *exec_args[50];
+            int j = 0;
+            exec_args[j++] = command;
+            if (args != NULL) {
+                for (int k = 0; args[k] != NULL && j < 49; k++) {
+                    exec_args[j++] = args[k];
+                }
+            }
+            exec_args[j] = NULL;
+
+            execv(command, exec_args);
+            
+            char error_message[30] = "An error has occurred\n";
+            write(STDERR_FILENO, error_message, strlen(error_message));
+            exit(1);
+        }
+    }
+    
     for (int i = 0; paths != NULL && paths[i] != NULL; i++)
     {
         snprintf(exec_path, sizeof(exec_path), "%s/%s", paths[i], command);
@@ -99,6 +121,27 @@ void execute_command(char *command, char **args, char **paths, char *output_file
         // --- Child process ---
         char exec_path[256];
         int found = 0;
+        
+        if (strchr(command, '/')) {
+        if (access(command, X_OK) == 0) {
+            // Build argument list for execv()
+            char *exec_args[50];
+            int j = 0;
+            exec_args[j++] = command;
+            if (args != NULL) {
+                for (int k = 0; args[k] != NULL && j < 49; k++) {
+                    exec_args[j++] = args[k];
+                }
+            }
+            exec_args[j] = NULL;
+
+            execv(command, exec_args);
+            // If execv returns, it failed
+            char error_message[30] = "An error has occurred\n";
+            write(STDERR_FILENO, error_message, strlen(error_message));
+            exit(1);
+        }
+    }
 
         for (int i = 0; paths[i] != NULL; i++)
         {
