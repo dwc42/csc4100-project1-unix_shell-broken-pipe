@@ -18,7 +18,7 @@ to run
 ```bash
 out/wish
 ```
-or to run a bash like file
+To run a bash like file.  
 ```bash
 out/wish <path to file>
 ```
@@ -26,7 +26,7 @@ To compile and find memory leaks.
 ```bash
 gcc -fsanitize=address -g $(find . -path './archive' -prune -o -name "*.c" -type f -print) -o out/wish
 ```
-To just compile  
+To just compile.  
 ```bash
 gcc -g $(find . -path './archive' -prune -o -name "*.c" -type f -print) -o out/wish
 ```
