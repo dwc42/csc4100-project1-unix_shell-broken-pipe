@@ -7,7 +7,7 @@
 
 ## Built-in Commands
  - cd: changes current directory
- - path: changes command search path
+ - path: changes command search paths
  - exit: exits the program
 
 runs exes/commands as well.  
