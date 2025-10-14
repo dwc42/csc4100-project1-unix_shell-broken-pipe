@@ -1,4 +1,10 @@
 # Command Shell 
+
+## Group Members
+ - Daniel Davis
+ - Dow Cox
+ - Gerardo Ramirez
+
 ## Built-in Commands
  - cd: changes current directory
  - path: changes command search path
